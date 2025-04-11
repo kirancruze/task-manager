@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            width: 300px;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 2px 2px 10px grey;
+            border-radius: 10px;
+        }
+        input {
+            width: 80%;
+            padding: 5px;
+        }
+        button {
+            padding: 5px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: lightgrey;
+            margin: 5px;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Task Manager</h2>
+        <input id="taskInput" type="text" placeholder="Enter task">
+        <button onclick="addTask()">Add</button>
+        <ul id="taskList"></ul>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", loadTasks);
+        
+        function addTask() {
+            let input = document.getElementById("taskInput");
+            let task = input.value.trim();
+            if (task === "") return;
+            
+            let ul = document.getElementById("taskList");
+            let li = document.createElement("li");
+            li.innerHTML = `<span onclick="toggleTask(this)">${task}</span> <button onclick="removeTask(this)">X</button>`;
+            ul.appendChild(li);
+            
+            saveTasks();
+            input.value = "";
+        }
+        
+        function removeTask(btn) {
+            btn.parentElement.remove();
+            saveTasks();
+        }
+        
+        function toggleTask(span) {
+            span.classList.toggle("completed");
+            saveTasks();
+        }
+        
+        function saveTasks() {
+            let tasks = [];
+            document.querySelectorAll("#taskList li").forEach(li => {
+                tasks.push({
+                    text: li.children[0].innerText,
+                    done: li.children[0].classList.contains("completed")
+                });
+            });
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+        
+        function loadTasks() {
+            let saved = JSON.parse(localStorage.getItem("tasks")) || [];
+            let ul = document.getElementById("taskList");
+            saved.forEach(t => {
+                let li = document.createElement("li");
+                li.innerHTML = `<span onclick="toggleTask(this)" class="${t.done ? 'completed' : ''}">${t.text}</span> <button onclick="removeTask(this)">X</button>`;
+                ul.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
